@@ -3,6 +3,12 @@ project(crud)
 
 set(CMAKE_CXX_STANDARD 11)
 
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/include/oatpp-1.3.0/oatpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/include/oatpp-1.3.0/oatpp-sqlite
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/include/oatpp-1.3.0/oatpp-swagger
+)
+
 add_library(crud-lib
         src/controller/StaticController.hpp
         src/controller/UserController.hpp
@@ -18,55 +24,87 @@ add_library(crud-lib
         src/ErrorHandler.cpp
         src/ErrorHandler.hpp)
 
-## include directories
-
+# # include directories
 target_include_directories(crud-lib PUBLIC src)
 
-
-## link libs
-
-find_package(oatpp          1.3.0 REQUIRED)
-find_package(oatpp-swagger  1.3.0 REQUIRED)
-find_package(oatpp-sqlite   1.3.0 REQUIRED)
+# # link libs
+link_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/sqlite3/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/oatpp-1.3.0
+)
 
 target_link_libraries(crud-lib
-        # Oat++
-        PUBLIC oatpp::oatpp
-        PUBLIC oatpp::oatpp-swagger
-        PUBLIC oatpp::oatpp-sqlite
+        PUBLIC oatpp
+        PUBLIC oatpp-swagger
+        PUBLIC oatpp-sqlite
+        PUBLIC sqlite3
+        PUBLIC oatpp-test
 )
+
+# target_link_libraries(crud-lib
+# # Oat++
+# PUBLIC oatpp
+# PUBLIC oatpp-swagger
+# PUBLIC oatpp-sqlite
+# )
+find_package(oatpp 1.3.0 REQUIRED
+        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/cmake
+)
+find_package(oatpp-swagger 1.3.0 REQUIRED
+        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/cmake
+)
+find_package(oatpp-sqlite 1.3.0 REQUIRED
+        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/cmake
+)
+
+# find_package(oatpp-test 1.3.0 REQUIRED
+# PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/cmake
+# )
+
+# target_link_libraries(crud-lib
+# PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/lib/oatpp-1.3.0/liboatpp-test.so
+# # Oat++
+# PUBLIC oatpp::oatpp
+# PUBLIC oatpp::oatpp-swagger
+# PUBLIC oatpp::oatpp-sqlite
+# )
 
 # If CMake can't find SQLite3:
 #
 # 1. Make sure that you've built oatpp-sqlite with -DOATPP_SQLITE_AMALGAMATION=ON flag
 # 2. If you are not willing to use SQLite amalgamation then uncomment the following lines:
 #
-#find_package(SQLite3 REQUIRED)
-#
-#target_link_libraries(crud-lib
-#        PUBLIC SQLite::SQLite3
-#)
+# find_package(SQLite3 REQUIRED
+# )
 
+# target_link_libraries(crud-lib
+# PUBLIC SQLite::SQLite3
+# )
+
+# target_link_libraries(crud-lib
+# PUBLIC sqlite3
+# )
 add_definitions(
-        ## define path to swagger-ui static resources folder
-        -DOATPP_SWAGGER_RES_PATH="${oatpp-swagger_INCLUDE_DIRS}/../bin/oatpp-swagger/res"
 
-        ## SQLite database file
+        # # define path to swagger-ui static resources folder
+        -DOATPP_SWAGGER_RES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/oatpp/include/oatpp-1.3.0/bin/oatpp-swagger/res"
+
+        # # SQLite database file
         -DDATABASE_FILE="${CMAKE_CURRENT_SOURCE_DIR}/db.sqlite"
-        ## SQLite database test file
+
+        # # SQLite database test file
         -DTESTDATABASE_FILE="${CMAKE_CURRENT_SOURCE_DIR}/test-db.sqlite"
 
-        ## Path to database migration scripts
+        # # Path to database migration scripts
         -DDATABASE_MIGRATIONS="${CMAKE_CURRENT_SOURCE_DIR}/sql"
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    find_package(Threads REQUIRED)
-    target_link_libraries(crud-lib INTERFACE Threads::Threads ${CMAKE_DL_LIBS})
+        find_package(Threads REQUIRED)
+        target_link_libraries(crud-lib INTERFACE Threads::Threads ${CMAKE_DL_LIBS})
 endif()
 
-## add executables
-
+# # add executables
 add_executable(crud-exe src/App.cpp)
 target_link_libraries(crud-exe crud-lib)
 
