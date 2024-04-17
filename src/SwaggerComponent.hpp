@@ -18,6 +18,13 @@ public:
    */
   OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::swagger::DocumentInfo>, swaggerDocumentInfo)([] {
     
+    oatpp::swagger::DocumentInfo::SecuritySchemeBuilder securitySchemeBuilder;
+    securitySchemeBuilder
+    .setType("apiKey")
+    .setName("Authorization")
+    .setIn("header")
+    .setDescription("Enter: \"Token the.jwt.token\"");    
+
     oatpp::swagger::DocumentInfo::Builder builder;
     
     builder
@@ -27,6 +34,8 @@ public:
     .setContactName("Ivan Ovsyanochka")
     .setContactUrl("https://oatpp.io/")
     
+    .addSecurityScheme("Token", securitySchemeBuilder.build())
+
     .setLicenseName("Apache License, Version 2.0")
     .setLicenseUrl("http://www.apache.org/licenses/LICENSE-2.0")
     
