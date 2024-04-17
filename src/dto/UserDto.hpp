@@ -16,6 +16,13 @@ class UserDto : public oatpp::DTO {
   DTO_INIT(UserDto, DTO)
 
   DTO_FIELD(Int32, id);
+  DTO_FIELD_INFO(token) {
+    info->description = "登录返回的token";
+  };
+  DTO_FIELD(String, token);  
+  DTO_FIELD_INFO(userName) {
+    info->description = "用户名";
+  }
   DTO_FIELD(String, userName, "username");
   DTO_FIELD(String, email, "email");
   DTO_FIELD(String, password, "password");

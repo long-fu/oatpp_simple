@@ -1,6 +1,18 @@
 
 #include "UserService.hpp"
 
+oatpp::Object<UserDto> UserService::login(const oatpp::Object<UserDto>& dto) {
+  auto dbResult = m_database->getUserById(dto->id);
+  OATPP_ASSERT_HTTP(dbResult->isSuccess(), Status::CODE_500, dbResult->getErrorMessage());
+  OATPP_ASSERT_HTTP(dbResult->hasMoreToFetch(), Status::CODE_404, "User not found");
+
+  auto result = dbResult->fetch<oatpp::Vector<oatpp::Object<UserDto>>>();
+  OATPP_ASSERT_HTTP(result->size() == 1, Status::CODE_500, "Unknown error");
+  auto value = result[0].get();
+  value->token = "4e99e8c12de7e01535248d2bac85e732";
+  return result[0];
+}
+
 oatpp::Object<UserDto> UserService::createUser(const oatpp::Object<UserDto>& dto) {
 
   auto dbResult = m_database->createUser(dto);
